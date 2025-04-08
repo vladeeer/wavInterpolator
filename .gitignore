@@ -34,4 +34,4 @@
 *.wav
 *.mp3
 
-readWav
+wavInterpolator
