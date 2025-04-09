@@ -24,7 +24,7 @@ bool Wav::read(const std::string &name)
 		return false;
 	}
 
-	// Read file & fmr chunks
+	// Read "file" & "fmt" chunks
 	file.read((char *)&(this->header), 36);
 
 	// Ignore "LIST" chunk if present
@@ -77,6 +77,54 @@ bool Wav::read(const std::string &name)
 	}
 
 	file.close();
+
+	std::cout << "Read wav file: " << name << '\n';
+	return true;
+}
+
+bool Wav::write(const std::string &name)
+{
+	std::ofstream file(name, std::ios::binary);
+	if (!file.is_open())
+	{
+		std::cout << "Failed to open file:" << name << '\n';
+		return false;
+	}
+
+	file.write((char *)&(this->header), sizeof(WavHeader));
+
+	if (this->header.audioFormat != 1)
+	{
+		std::cout << "Only integer uncompressed format is supported!";
+		return false;
+	}
+
+	if (this->header.bitsPerSample != 16)
+	{
+		std::cout << "Only two byte samples are supported!";
+		return false;
+	}
+
+	if (this->header.nbrChannels != 2)
+	{
+		std::cout << "Only stereo supported!";
+		return false;
+	}
+
+	uint16_t *lPtr = this->samples[0].data();
+	uint16_t *rPtr = this->samples[1].data();
+	for (uint32_t i; i < this->header.dataSize / 4; i++)
+	{
+		file.write((char *)lPtr, 2);
+		file.write((char *)rPtr, 2);
+		// std::cout << this->samples[0][i] << ' ' << this->samples[1][i] << '\n';
+		lPtr++;
+		rPtr++;
+	}
+
+	file.close();
+
+	std::cout << "Written to wav file: " << name << '\n';
 	return true;
 }
 

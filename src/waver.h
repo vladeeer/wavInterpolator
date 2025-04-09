@@ -30,6 +30,7 @@ public:
 
 public:
    bool read(const std::string &name);
+   bool write(const std::string &name);
    void print() const;
 
 public:
