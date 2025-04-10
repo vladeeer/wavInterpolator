@@ -1,15 +1,38 @@
 #include <cstdint>
+#include <cmath>
 
-__global__ void addZeroes(const uint16_t *inSamples, const uint32_t numInSamples,
-                          uint16_t *outSamples, uint32_t k)
+__global__ void filterDataKernel(const float *inSamples,
+                                 const uint32_t numFilteredSamples,
+                                 const float *taps,
+                                 const uint32_t nTaps,
+                                 float *outSamples)
 {
-   int i = blockDim.x * blockIdx.x + threadIdx.x;
+   uint32_t i = blockDim.x * blockIdx.x + threadIdx.x;
+   float convolutionSum = 0.0f;
+   if (i < numFilteredSamples)
+   {
+      for (uint32_t j = 0; j < nTaps; j++)
+      {
+         // printf("numFilteredSamples: %u, i: %u, j: %u\n", numFilteredSamples, i, j);
+         convolutionSum += taps[j] * inSamples[i + nTaps - j - 1];
+      }
+   }
+
+   outSamples[i] = convolutionSum;
+}
+
+__global__ void addZeroesKernel(const float *inSamples,
+                                const uint32_t numInSamples,
+                                const uint32_t interpolationFactor,
+                                float *outSamples)
+{
+   uint32_t i = blockDim.x * blockIdx.x + threadIdx.x;
    if (i < numInSamples)
    {
-      outSamples[i * k] = inSamples[i];
-      for (uint32_t idx = 1; idx < k; idx++)
+      outSamples[i * interpolationFactor] = inSamples[i] * interpolationFactor * 0.80; // Compensation for filter loss
+      for (uint32_t idx = 1; idx < interpolationFactor; idx++)
       {
-         outSamples[i * k + idx] = 0;
+         outSamples[i * interpolationFactor + idx] = 0;
       }
    }
 }

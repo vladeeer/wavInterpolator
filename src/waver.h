@@ -13,8 +13,8 @@ struct WavHeader
    uint16_t audioFormat;   // 2
    uint16_t nbrChannels;   // 2
    uint32_t frequency;     // 4
-   uint32_t bytePerSec;    // 4
-   uint16_t bytePerBlock;  // 2
+   uint32_t bytesPerSec;   // 4
+   uint16_t bytesPerBlock; // 2
    uint16_t bitsPerSample; // 2 (24 Total)
 
    char dataBlockID[4]; // 4
@@ -35,5 +35,5 @@ public:
 
 public:
    WavHeader header;
-   std::vector<uint16_t> samples[2];
+   std::vector<float> samples[2];
 };

@@ -64,16 +64,18 @@ bool Wav::read(const std::string &name)
 		return false;
 	}
 
-	this->samples[0].resize(this->header.dataSize / 4); // 2 * bytesPerSample
+	this->samples[0].resize(this->header.dataSize / 4); // numChannels * bytesPerSample
 	this->samples[1].resize(this->header.dataSize / 4);
-	uint16_t *lPtr = this->samples[0].data();
-	uint16_t *rPtr = this->samples[1].data();
+	float *lData = this->samples[0].data();
+	float *rData = this->samples[1].data();
+	int16_t buff;
 	for (uint32_t i; i < this->header.dataSize / 4; i++)
 	{
-		file.read((char *)lPtr, 2);
-		file.read((char *)rPtr, 2);
-		lPtr++;
-		rPtr++;
+		file.read((char *)&buff, 2);
+		lData[i] = static_cast<float>(buff);
+		file.read((char *)&buff, 2);
+		rData[i] = static_cast<float>(buff);
+		// std::cout << this->samples[0][i] << ' ' << this->samples[1][i] << '\n';
 	}
 
 	file.close();
@@ -111,15 +113,15 @@ bool Wav::write(const std::string &name)
 		return false;
 	}
 
-	uint16_t *lPtr = this->samples[0].data();
-	uint16_t *rPtr = this->samples[1].data();
+	float *lData = this->samples[0].data();
+	float *rData = this->samples[1].data();
+	int16_t buff;
 	for (uint32_t i; i < this->header.dataSize / 4; i++)
 	{
-		file.write((char *)lPtr, 2);
-		file.write((char *)rPtr, 2);
-		// std::cout << this->samples[0][i] << ' ' << this->samples[1][i] << '\n';
-		lPtr++;
-		rPtr++;
+		buff = static_cast<int16_t>(lData[i]);
+		file.write((char *)&buff, 2);
+		buff = static_cast<int16_t>(rData[i]);
+		file.write((char *)&buff, 2);
 	}
 
 	file.close();
@@ -142,8 +144,8 @@ void Wav::print() const
 		 << "audioFormat     " << this->header.audioFormat << '\n'
 		 << "nbrChannels     " << this->header.nbrChannels << '\n'
 		 << "frequency       " << this->header.frequency << '\n'
-		 << "bytePerSec      " << this->header.bytePerSec << '\n'
-		 << "bytePerBlock    " << this->header.bytePerBlock << '\n'
+		 << "bytesPerSec     " << this->header.bytesPerSec << '\n'
+		 << "bytesPerBlock   " << this->header.bytesPerBlock << '\n'
 		 << "bitsPerSample   " << this->header.bitsPerSample << '\n'
 		 << "---------------------------------" << '\n'
 		 << "dataBlockID     " << std::string(this->header.dataBlockID, 4) << '\n'
