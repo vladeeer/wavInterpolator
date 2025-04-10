@@ -8,5 +8,5 @@ Run with
 ```
 ./wavInterpolator file factor
 ```
-file - path to RIFF WAVE file (.wav format)
+file - path to RIFF WAVE file (.wav format)<br />
 factor - integer interpolation factor, must be a multiple of 2, 3 or 5. For example: 72
