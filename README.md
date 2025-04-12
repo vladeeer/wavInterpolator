@@ -20,4 +20,9 @@ Run example:
 ```
 user@host:~/wavInterpolator/build$ ./wavInterpolator ../exampleWavs/Hellcat11025.wav 60 hugeCat.wav
 ```
+<br />Run test:
+```
+user@host:~/wavInterpolator/build$ cd test
+user@host:~/wavInterpolator/build/test$ ./runTest
+```
 
