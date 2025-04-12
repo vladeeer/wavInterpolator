@@ -29,7 +29,7 @@ __global__ void addZeroesKernel(const float *inSamples,
    uint32_t i = blockDim.x * blockIdx.x + threadIdx.x;
    if (i < numInSamples)
    {
-      outSamples[i * interpolationFactor] = inSamples[i] * interpolationFactor * 0.8; // Compensate for filter loss
+      outSamples[i * interpolationFactor] = inSamples[i] * interpolationFactor * 0.7; // Compensate for filter loss
       for (uint32_t idx = 1; idx < interpolationFactor; idx++)
       {
          outSamples[i * interpolationFactor + idx] = 0;

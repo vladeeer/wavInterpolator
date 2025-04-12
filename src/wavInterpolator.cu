@@ -32,8 +32,8 @@ bool addZeroes(float *&d_lReadSwapBuff, float *&d_rReadSwapBuff,
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess)
     {
-        printf("Failed to run cuda kernel (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to run cuda kernel (error code %s)!\n",
+                cudaGetErrorString(err));
         return false;
     }
 
@@ -81,8 +81,8 @@ bool filterData(float *&d_lReadSwapBuff, float *&d_rReadSwapBuff,
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess)
     {
-        printf("Failed to run cuda kernel (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to run cuda kernel (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
 
@@ -94,10 +94,16 @@ bool filterData(float *&d_lReadSwapBuff, float *&d_rReadSwapBuff,
 
 int main(int argc, char *argv[])
 {
+    if (argc != 4)
+    {
+        std::cerr << "Usage: " << argv[0] << " <input_file> <interpolation_factor> <output_file>\n";
+        return 1;
+    }
+
     Wav wav;
     if (!wav.read(argv[1]))
     {
-        std::cout << "Failed to read wav file" << '\n';
+        std::cerr << "Failed to read wav file" << '\n';
         return 1;
     }
 
@@ -125,7 +131,7 @@ int main(int argc, char *argv[])
     }
     if (k != 1)
     {
-        std::cout << "Interpolation factor must be a multiple of 2, 3, 5." << '\n'
+        std::cerr << "Interpolation factor must be a multiple of 2, 3, 5." << '\n'
                   << "Example: 60 = 5 * 3 * 2 * 2" << '\n';
         return 1;
     }
@@ -153,58 +159,58 @@ int main(int argc, char *argv[])
     err = cudaMalloc((void **)&d_lWriteSwapBuff, numSamplesWithZeroes * sizeof(float));
     if (err != cudaSuccess)
     {
-        printf("Failed to allocate device memory for left channel write swap buffer (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to allocate device memory for left channel write swap buffer (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
     err = cudaMalloc((void **)&d_rWriteSwapBuff, numSamplesWithZeroes * sizeof(float));
     if (err != cudaSuccess)
     {
-        printf("Failed to allocate device memory for right channel write swap buffer (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to allocate device memory for right channel write swap buffer (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
     err = cudaMalloc((void **)&d_lReadSwapBuff, numSamplesWithZeroes * sizeof(float));
     if (err != cudaSuccess)
     {
-        printf("Failed to allocate device memory for left channel read swap buffer (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to allocate device memory for left channel read swap buffer (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
     err = cudaMalloc((void **)&d_rReadSwapBuff, numSamplesWithZeroes * sizeof(float));
     if (err != cudaSuccess)
     {
-        printf("Failed to allocate device memory for right channel read swap buffer (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to allocate device memory for right channel read swap buffer (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
     err = cudaMalloc((void **)&d_tapsArr, sizeof(tapsArr));
     if (err != cudaSuccess)
     {
-        printf("Failed to allocate device memory for taps (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to allocate device memory for taps (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
 
     err = cudaMemcpy(d_lReadSwapBuff, wav.samples[0].data(), channelDataSize, cudaMemcpyHostToDevice);
     if (err != cudaSuccess)
     {
-        printf("Failed to copy left channel data to device (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to copy left channel data to device (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
     err = cudaMemcpy(d_rReadSwapBuff, wav.samples[1].data(), channelDataSize, cudaMemcpyHostToDevice);
     if (err != cudaSuccess)
     {
-        printf("Failed to copy right channel data to device (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to copy right channel data to device (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
     err = cudaMemcpy(d_tapsArr, tapsArr, sizeof(tapsArr), cudaMemcpyHostToDevice);
     if (err != cudaSuccess)
     {
-        printf("Failed to copy taps to device (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to copy taps to device (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
 
@@ -270,15 +276,15 @@ int main(int argc, char *argv[])
     err = cudaMemcpy(wav.samples[0].data(), d_lReadSwapBuff, numFilteredSamples * sizeof(float), cudaMemcpyDeviceToHost);
     if (err != cudaSuccess)
     {
-        printf("Failed to copy left channel samples from device (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to copy left channel samples from device (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
     err = cudaMemcpy(wav.samples[1].data(), d_rReadSwapBuff, numFilteredSamples * sizeof(float), cudaMemcpyDeviceToHost);
     if (err != cudaSuccess)
     {
-        printf("Failed to copy right channel samples from device (error code %s)!\n",
-               cudaGetErrorString(err));
+        fprintf(stderr, "Failed to copy right channel samples from device (error code %s)!\n",
+                cudaGetErrorString(err));
         return 1;
     }
 
@@ -292,7 +298,7 @@ int main(int argc, char *argv[])
 
     if (!wav.write(argv[3]))
     {
-        std::cout << "Failed to write wav file" << '\n';
+        std::cerr << "Failed to write wav file" << '\n';
         return 1;
     }
 

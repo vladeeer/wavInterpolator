@@ -20,7 +20,7 @@ bool Wav::read(const std::string &name)
 	std::ifstream file(name, std::ios::binary);
 	if (!file.is_open())
 	{
-		std::cout << "Failed to open file:" << name << '\n';
+		std::cerr << "Failed to open file:" << name << '\n';
 		return false;
 	}
 
@@ -48,19 +48,19 @@ bool Wav::read(const std::string &name)
 
 	if (this->header.audioFormat != 1)
 	{
-		std::cout << "Only integer uncompressed format is supported!";
+		std::cerr << "Only integer uncompressed format is supported!";
 		return false;
 	}
 
 	if (this->header.bitsPerSample != 16)
 	{
-		std::cout << "Only two byte samples are supported!";
+		std::cerr << "Only two byte samples are supported!";
 		return false;
 	}
 
 	if (this->header.nbrChannels != 2)
 	{
-		std::cout << "Only stereo supported!";
+		std::cerr << "Only stereo supported!";
 		return false;
 	}
 
@@ -89,7 +89,7 @@ bool Wav::write(const std::string &name)
 	std::ofstream file(name, std::ios::binary);
 	if (!file.is_open())
 	{
-		std::cout << "Failed to open file:" << name << '\n';
+		std::cerr << "Failed to open file:" << name << '\n';
 		return false;
 	}
 
@@ -97,19 +97,19 @@ bool Wav::write(const std::string &name)
 
 	if (this->header.audioFormat != 1)
 	{
-		std::cout << "Only integer uncompressed format is supported!";
+		std::cerr << "Only integer uncompressed format is supported!";
 		return false;
 	}
 
 	if (this->header.bitsPerSample != 16)
 	{
-		std::cout << "Only two byte samples are supported!";
+		std::cerr << "Only two byte samples are supported!";
 		return false;
 	}
 
 	if (this->header.nbrChannels != 2)
 	{
-		std::cout << "Only stereo supported!";
+		std::cerr << "Only stereo supported!";
 		return false;
 	}
 
