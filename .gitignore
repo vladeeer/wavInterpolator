@@ -34,4 +34,6 @@
 *.wav
 *.mp3
 
+build
+
 wavInterpolator

@@ -290,7 +290,7 @@ int main(int argc, char *argv[])
 
     wav.print();
 
-    if (!wav.write("out.wav"))
+    if (!wav.write(argv[3]))
     {
         std::cout << "Failed to write wav file" << '\n';
         return 1;
